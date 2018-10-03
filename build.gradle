@@ -9,7 +9,38 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'maven-publish'
 }
+
+group = 'org.example'
+version = '1.0'
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        myLibrary(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar
+        }
+    }
+
+    repositories {
+        maven {
+            url "s3://maven.spuukee.com"
+            authentication {
+                awsIm(AwsImAuthentication) // load from EC2 role or env var
+            }
+        }
+    }
+}
+
+
+
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
